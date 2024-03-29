@@ -3,7 +3,9 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
 from config import APIkey
 
-json_filename = 'api_import_data.json'
+json_crypto_filename = 'api_import_crypto.json'
+json_fiat_filename = 'api_import_fiat.json'
+
 
 def get_data():
     # Extract JSON values for the given coin IDs and store this data into a file
@@ -25,6 +27,10 @@ def get_data():
     11419   TON    Toncoin
     825     USDT   Tether USDt
     13502   WLD    Worldcoin 
+    --- FIAT ---
+    2781    USD    United States Dollar
+    2790    EUR    Euro 
+	2806	RUB    Russian Ruble
     --- END ---
     '''
     session = Session()
@@ -35,9 +41,9 @@ def get_data():
         json_data = response.json()
         # Error handling
         if json_data['status']['error_code'] == 0:
-            with open(json_filename, 'w', encoding='utf-8') as file:
+            with open(json_crypto_filename, 'w', encoding='utf-8') as file:
                 json.dump(json_data, file, indent=4)
-            print('Hey, ', json_filename, ' file has been saved successfully.')
+            print('Hey, ', json_crypto_filename, ' file has been saved successfully.')
         else:
             print('Something is wrong. JSON file was not saved. Check this:')
             print(json_data['status']['error_message'])
@@ -49,7 +55,7 @@ def get_data():
 def parameters():
     # Extract data from the saved file and assign the values to the variables
 
-    with open(json_filename, 'r', encoding='utf-8') as file:
+    with open(json_crypto_filename, 'r', encoding='utf-8') as file:
         json_data = json.load(file)
         id_btc = json_data['data']['1']['id']
         symbol_btc = json_data['data']['1']['symbol']
@@ -63,7 +69,8 @@ def mapping():
     # because there are several tokens with the same symbol
 
     # THIS IS PROD LINK - your API tokens will be spent
-    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'  # CRYPTO
+    # url = 'https://pro-api.coinmarketcap.com/v1/fiat/map'   # FIAT
     parameters = {
         'symbol': 'BTC,ETH,TON,USDT,WLD',
         'listing_status': 'active'
@@ -87,5 +94,5 @@ def mapping():
 
 if __name__ == '__main__':
     # mapping()
-    # get_data()
-    parameters()
+    get_data()
+    # parameters()
