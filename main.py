@@ -4,13 +4,15 @@ import json
 from config import APIkey
 
 json_filename = 'api_import_data.json'
+token_list = '1,1027,11419,825,13502'
 
-def get_data():
+
+def get_crypto_data():
     # Extract JSON values for the given coin IDs and store this data into a file
     # THIS IS PROD LINK - your API tokens will be spent
     url = 'https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest'
     parameters = {
-        'id': '1,1027,11419,825,13502',
+        'id': token_list,
         'convert': 'EUR'
     }
     headers = {
@@ -25,6 +27,10 @@ def get_data():
     11419   TON    Toncoin
     825     USDT   Tether USDt
     13502   WLD    Worldcoin 
+    --- FIAT ---
+    2781    USD    United States Dollar
+    2790    EUR    Euro 
+	2806	RUB    Russian Ruble
     --- END ---
     '''
     session = Session()
@@ -46,24 +52,13 @@ def get_data():
         print(e)
 
 
-def parameters():
-    # Extract data from the saved file and assign the values to the variables
-
-    with open(json_filename, 'r', encoding='utf-8') as file:
-        json_data = json.load(file)
-        id_btc = json_data['data']['1']['id']
-        symbol_btc = json_data['data']['1']['symbol']
-        name_btc = json_data['data']['1']['name']
-        price_btc = json_data['data']['1']['quote']['EUR']['price']
-        print(id_btc, ' ', symbol_btc, ' ', name_btc, ' ', price_btc, 'EUR')
-
-
 def mapping():
     # Map request is here to obtain IDs of the tokens, it is recommended to operate IDs, not the symbols
     # because there are several tokens with the same symbol
 
     # THIS IS PROD LINK - your API tokens will be spent
-    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map'  # CRYPTO
+
     parameters = {
         'symbol': 'BTC,ETH,TON,USDT,WLD',
         'listing_status': 'active'
@@ -87,5 +82,5 @@ def mapping():
 
 if __name__ == '__main__':
     # mapping()
-    # get_data()
-    parameters()
+    get_crypto_data()
+    # parameters()
