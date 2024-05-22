@@ -23,6 +23,7 @@ def get_currency_rates(link, key):
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
         currency_table = soup.find('table', {'class': 'table-Ngq2xrcG'})
+
         if currency_table:
             # limiting data for EUR-RUB only
             rows = currency_table.find_all(attrs={"data-rowkey": key})
@@ -33,7 +34,6 @@ def get_currency_rates(link, key):
                 currency_rates.append(cells[0].text.strip())  # currency_pair
                 currency_rates.append(cells[1].text.strip())  # rate
                 currency_rates.append(cells[2].text.strip())  # change
-
             return currency_rates
         else:
             print("Unable to find currency table on the page.")
@@ -85,17 +85,18 @@ def db_write(currency_pair, rate, change):
 
 if __name__ == "__main__":
 
+    print("Latest Currency Rates:")
     try:
-        print("Latest Currency Rates:")
         for row in params:
             currency_rates = get_currency_rates(row[0], row[1])
             if currency_rates:
                 currency_pair, rate, change = currency_rates  # assigning values to the array
                 currency_pair = currency_pair[3:6]
-                change = float(change.replace('%', ''))
-                # print(currency_pair, rate, change)
+                change = None
+                # change = float(change.replace('%', ''))     # this throws an error for some reason, because of float
+                print(currency_pair, rate, change)
                 db_write(currency_pair, rate, change)
             else:
                 print("Failed to fetch currency rates.")
-    except:
+    except ValueError:
         print("Failed to iterate through rates table.")
