@@ -1,20 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import pyodbc
-from config import server, database, db_user, db_password
+from config import server, database, db_user, db_password, params
 from datetime import date
-
-# USD input data
-usd_datarowkey = 'FX_IDC:EURUSD'
-usd_link = 'https://www.tradingview.com/markets/currencies/rates-major/'
-# RUB input data
-rub_datarowkey = 'FX_IDC:EURRUB'
-rub_link = 'https://www.tradingview.com/markets/currencies/rates-exotic/'
-
-params = [
-    [usd_link, usd_datarowkey],
-    [rub_link, rub_datarowkey]
-]
 
 
 def get_currency_rates(link, key):
@@ -83,8 +71,7 @@ def db_write(currency_pair, rate, change):
     print('Connection closed')
 
 
-if __name__ == "__main__":
-
+def currency_import_write():
     print("Latest Currency Rates:")
     try:
         for row in params:
@@ -92,11 +79,15 @@ if __name__ == "__main__":
             if currency_rates:
                 currency_pair, rate, change = currency_rates  # assigning values to the array
                 currency_pair = currency_pair[3:6]
-                change = None
+                # print(type(change))
                 # change = float(change.replace('%', ''))     # this throws an error for some reason, because of float
+                change = change.replace('%', '')
+                change = None
                 print(currency_pair, rate, change)
                 db_write(currency_pair, rate, change)
             else:
                 print("Failed to fetch currency rates.")
     except ValueError:
         print("Failed to iterate through rates table.")
+
+
